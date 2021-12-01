@@ -4,7 +4,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     kotlin("jvm") version "1.5.31"
-    id("org.jetbrains.compose") version "1.0.0-beta5"//"1.0.0-beta6-dev450"
+    id("org.jetbrains.compose") version "1.0.0-rc3"
 }
 
 group = "ua.kulya.jbcomposeheavyweightoverlay"
