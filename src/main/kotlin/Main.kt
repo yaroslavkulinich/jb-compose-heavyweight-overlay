@@ -43,36 +43,16 @@ fun main() = application {
 
 @Composable
 fun RootUI() {
-    SwingPanel( // <--- Swing panel as root for hierarchy where drawing over heavyweight components needed (Swing/Compose switching trick START)
-        modifier = Modifier.fillMaxSize().background(Color.Yellow),
-        factory = {
-            ComposePanel().apply { // <--- Switch back to Compose world for layout management purposes (Swing/Compose switching trick END)
-                setContent {
-                    val selectedMode = remember { mutableStateOf(Mode.Control) }
-                    Box { // <--- Here we use Box to make layering of SwingPanels
-
-                        // Bottom MAP layer
-                        SwingPanel( // <--- Here we use Swing panel to show WorldWindGLCanvas from Swing world (proper use of SwingPanel)
-                            modifier = Modifier.fillMaxSize().background(Color.Black),
-                            factory = { createJPanelWithWorldWindMap() }
-                        )
-
-                        // Map OVERLAY layer
-                        SwingPanel( // <--- Here we use Swing panel to make a trick wrapping Compose layout (Swing/Compose switching trick START). If we do not wrap Compose with SwingPanel here, you will not see Compose content over WorldWindGLCanvas(Swing)
-                            modifier = Modifier.width(60.dp).fillMaxHeight().align(Alignment.CenterStart),
-                            factory = {
-                                ComposePanel().apply { // <-- Swing/Compose switching trick END
-                                    setContent {
-                                        ComposeOverlay(selectedMode = selectedMode.value, onModeChanged = { selectedMode.value = it }) // <--- This is our Compose components we want to draw over WorldWindGLCanvas(Swing)
-                                    }
-                                }
-                            }
-                        )
-                    }
-                }
-            }
-        }
-    )
+    val selectedMode = remember { mutableStateOf(Mode.Control) }
+    Box { // <--- Here we use Box to make layering of SwingPanels
+        // Bottom MAP layer
+        SwingPanel(
+            modifier = Modifier.fillMaxSize().background(Color.Black),
+            factory = { createJPanelWithWorldWindMap() }
+        )
+        // MAP Overlay
+        ComposeOverlay(selectedMode = selectedMode.value, onModeChanged = { selectedMode.value = it }) // <--- This is our Compose components we want to draw over WorldWindGLCanvas(Swing)
+    }
 }
 
 @Composable
