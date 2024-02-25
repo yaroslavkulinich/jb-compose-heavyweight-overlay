@@ -31,9 +31,14 @@ import java.util.*
 import javax.swing.BoxLayout
 import javax.swing.JPanel
 
+// MAC
 // Comment: clipping works only for regular swing content but not for heavyweight or compose
 // Comment: on Mac - no chance to work over heavyweight if graphics.on = true (not displaying at all)
 // Comment: on Mac - swing panel over heavyweight works but with positioning problems
+
+// WINDOWS
+// Without flags overlay renders but in another order - you cant turn off and then on overlay - you should off/on map to see overlay
+// Blending on: WW doesn't shown
 
 // Purpose of this sample is to show the trick how to draw and control(click responses) Compose elements over Heavyweight Swing/AWT components like Maps, VideoPlayers etc...
 fun main() = application {
