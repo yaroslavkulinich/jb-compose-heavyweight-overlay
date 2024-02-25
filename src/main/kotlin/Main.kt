@@ -19,15 +19,21 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
 import gov.nasa.worldwind.BasicModel
 import gov.nasa.worldwind.awt.WorldWindowGLCanvas
+import org.jetbrains.skiko.GraphicsApi
 import java.awt.Dimension
 import java.util.*
 import javax.swing.BoxLayout
 import javax.swing.JPanel
+
+// Comment: clipping works only for regular swing content but not for heavyweight or compose
+// Comment: on Mac - no chance to work over heavyweight if graphics.on = true (not displaying at all)
+// Comment: on Mac - swing panel over heavyweight works but with positioning problems
 
 // Purpose of this sample is to show the trick how to draw and control(click responses) Compose elements over Heavyweight Swing/AWT components like Maps, VideoPlayers etc...
 fun main() = application {
@@ -45,7 +51,7 @@ fun main() = application {
 
 @Composable
 fun RootUI() {
-    Column {
+    Column(Modifier.background(Color.LightGray)) {
         var leftPanelShown by remember { mutableStateOf(false) }
         var rightPanelShown by remember { mutableStateOf(false) }
         var bottomPanelShown by remember { mutableStateOf(false) }
@@ -90,9 +96,17 @@ fun RootUI() {
                 if (mapShown) {
                     // Bottom MAP layer
                     SwingPanel( // <--- Here we use Swing panel to show WorldWindGLCanvas from Swing world (proper use of SwingPanel)
-                        modifier = Modifier.fillMaxSize().background(Color.Black),
+                        modifier = Modifier.fillMaxSize().background(Color.Black).clip(RoundedCornerShape(12.dp)),
                         factory = { createJPanelWithWorldWindMap() }
                     )
+                }
+                Popup(alignment = Alignment.Center) {
+                    Box(
+                        Modifier.size(200.dp, 100.dp).background(Color.Gray),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text("Popup")
+                    }
                 }
                 Row {
                     if (!overlaysLeft) {
@@ -125,21 +139,24 @@ fun RootUI() {
 private fun OverlaysUI(modifier: Modifier, swingComposeShown: Boolean, composeShown: Boolean) {
     Column(modifier, verticalArrangement = Arrangement.spacedBy(4.dp)) {
         if (swingComposeShown) {
-            SwingPanel( // <--- Here we use Swing panel to make a trick wrapping Compose layout (Swing/Compose switching trick START). If we do not wrap Compose with SwingPanel here, you will not see Compose content over WorldWindGLCanvas(Swing)
-                modifier = Modifier.clip(RoundedCornerShape(6.dp)).fillMaxWidth().weight(1f).background(Color.Yellow, RoundedCornerShape(12.dp)),
-                factory = {
-                    ComposePanel().apply { // <-- Swing/Compose switching trick END
-                        setContent {
-                            Box(
-                                Modifier.fillMaxSize().background(Color.Green, RoundedCornerShape(12.dp)),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Text("Swing Compose")
+//            Box(Modifier.weight(1f).fillMaxWidth().background(Color.DarkGray, RoundedCornerShape(12.dp))) {
+                SwingPanel( // <--- Here we use Swing panel to make a trick wrapping Compose layout (Swing/Compose switching trick START). If we do not wrap Compose with SwingPanel here, you will not see Compose content over WorldWindGLCanvas(Swing)
+                    modifier = Modifier.clip(RoundedCornerShape(6.dp)).weight(1f).fillMaxWidth().clip(RoundedCornerShape(6.dp)),
+                    factory = {
+                        ComposePanel().apply { // <-- Swing/Compose switching trick END
+                            background = java.awt.Color.PINK
+                            setContent {
+                                Box(
+                                    Modifier.fillMaxSize().background(Color.Green, RoundedCornerShape(12.dp)),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Text("Swing Compose")
+                                }
                             }
                         }
                     }
-                }
-            )
+                )
+//            }
         }
         if (composeShown) {
             Box(
@@ -170,10 +187,14 @@ enum class Mode {
 }
 
 private fun setupSkikoRenderAPI() {
-    System.setProperty("compose.interop.blending", "true")
-    System.setProperty("compose.swing.render.on.graphics", "true")
+    //System.setProperty("compose.swing.render.on.graphics", "true")
+    //System.setProperty("compose.interop.blending", "true")
+    //System.setProperty("compose.layers.type", "true") // OnSameCanvas, Dialog, Popup
+
+
     when (getOS()) {
-//        OS.LINUX -> System.setProperty("skiko.renderApi", "OPENGL")
+        OS.LINUX -> System.setProperty("skiko.renderApi", "OPENGL")
+        OS.WINDOWS -> System.setProperty("skiko.renderApi", "DIRECT3D")
         OS.MAC -> System.setProperty("skiko.renderApi", "METAL")
         else -> {}
     }
