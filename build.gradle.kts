@@ -20,9 +20,6 @@ repositories {
 
 dependencies {
     implementation("com.github.imptah:worldwindjava:stable-SNAPSHOT")
-//    implementation("org.jogamp.gluegen:gluegen-rt-main:2.4.0")
-//    implementation("org.jogamp.jogl:jogl-all-main:2.4.0")
-//    implementation("org.codehaus.jackson:jackson-core-asl:1.9.13")
     implementation(compose.desktop.currentOs)
 }
 
