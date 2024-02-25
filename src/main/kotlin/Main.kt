@@ -38,7 +38,7 @@ import javax.swing.JPanel
 
 // WINDOWS
 // Without flags overlay renders but in another order - you cant turn off and then on overlay - you should off/on map to see overlay
-// Blending on: WW doesn't shown
+// Blending on: WW doesn't shown at all
 
 // Purpose of this sample is to show the trick how to draw and control(click responses) Compose elements over Heavyweight Swing/AWT components like Maps, VideoPlayers etc...
 fun main() = application {
@@ -96,7 +96,6 @@ fun RootUI() {
                     Text("Left Panel")
                 }
             }
-            val selectedMode = remember { mutableStateOf(Mode.Control) }
             Box(Modifier.weight(1f)) { // <--- Here we use Box to make layering of SwingPanels
                 if (mapShown) {
                     // Bottom MAP layer
