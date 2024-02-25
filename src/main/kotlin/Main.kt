@@ -14,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.awt.ComposePanel
 import androidx.compose.ui.awt.SwingPanel
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
@@ -125,7 +126,7 @@ private fun OverlaysUI(modifier: Modifier, swingComposeShown: Boolean, composeSh
     Column(modifier, verticalArrangement = Arrangement.spacedBy(4.dp)) {
         if (swingComposeShown) {
             SwingPanel( // <--- Here we use Swing panel to make a trick wrapping Compose layout (Swing/Compose switching trick START). If we do not wrap Compose with SwingPanel here, you will not see Compose content over WorldWindGLCanvas(Swing)
-                modifier = Modifier.fillMaxWidth().weight(1f).background(Color.Yellow, RoundedCornerShape(12.dp)),
+                modifier = Modifier.clip(RoundedCornerShape(6.dp)).fillMaxWidth().weight(1f).background(Color.Yellow, RoundedCornerShape(12.dp)),
                 factory = {
                     ComposePanel().apply { // <-- Swing/Compose switching trick END
                         setContent {
@@ -168,25 +169,11 @@ enum class Mode {
     Plan
 }
 
-@Composable
-fun ModeTab(
-    modifier: Modifier = Modifier,
-    text: String = "",
-    icon: ImageVector = Icons.Default.AccountBox,
-    selected: Boolean = false
-) {
-    Column(
-        modifier.width(72.dp).alpha(if (selected) 1.0f else 0.5f),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Icon(modifier = Modifier.size(32.dp), imageVector = icon, contentDescription = null, tint = Color.White)
-        Text(text = text, color = Color.White, fontSize = 10.sp)
-    }
-}
-
 private fun setupSkikoRenderAPI() {
+    System.setProperty("compose.interop.blending", "true")
+    System.setProperty("compose.swing.render.on.graphics", "true")
     when (getOS()) {
-        OS.LINUX, OS.WINDOWS -> System.setProperty("skiko.renderApi", "OPENGL")
+//        OS.LINUX -> System.setProperty("skiko.renderApi", "OPENGL")
         OS.MAC -> System.setProperty("skiko.renderApi", "METAL")
         else -> {}
     }
