@@ -25,6 +25,7 @@ import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
 import gov.nasa.worldwind.BasicModel
 import gov.nasa.worldwind.awt.WorldWindowGLCanvas
+import gov.nasa.worldwind.awt.WorldWindowGLJPanel
 import org.jetbrains.skiko.GraphicsApi
 import java.awt.Dimension
 import java.util.*
@@ -167,7 +168,9 @@ private fun OverlaysUI(modifier: Modifier, swingComposeShown: Boolean, composeSh
                 Modifier.fillMaxWidth().weight(1f).background(Color.Green, RoundedCornerShape(12.dp)),
                 contentAlignment = Alignment.Center
             ) {
-                Text("Compose")
+                Button(onClick = {}, modifier = Modifier.fillMaxSize()) {
+                    Text("Compose")
+                }
             }
         }
     }
@@ -178,7 +181,7 @@ private fun createJPanelWithWorldWindMap(): JPanel {
     return JPanel().apply {
         layout = BoxLayout(this, BoxLayout.Y_AXIS)
         this.background = java.awt.Color.RED
-        add(WorldWindowGLCanvas().apply {
+        add(WorldWindowGLJPanel().apply {
             preferredSize = Dimension(10, 10)
             model = BasicModel()
         })
@@ -192,7 +195,7 @@ enum class Mode {
 
 private fun setupSkikoRenderAPI() {
     //System.setProperty("compose.swing.render.on.graphics", "true")
-    //System.setProperty("compose.interop.blending", "true")
+    System.setProperty("compose.interop.blending", "true")
     //System.setProperty("compose.layers.type", "true") // OnSameCanvas, Dialog, Popup
 
 
