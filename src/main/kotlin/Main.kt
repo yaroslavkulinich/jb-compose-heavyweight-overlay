@@ -159,6 +159,7 @@ private fun createJPanelWithWorldWindMap(): JPanel {
         add(WorldWindowGLCanvas().apply {
             preferredSize = Dimension(10, 10)
             model = BasicModel()
+            model.layers.add(ArcGisWorldImageryLayer())
         })
     }
 }
